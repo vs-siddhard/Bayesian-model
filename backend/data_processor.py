@@ -7,7 +7,14 @@ import io
 from typing import Dict, List, Tuple, Any, Optional
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
+
+try:
+    from sklearn.model_selection import train_test_split
+except ImportError:
+    def train_test_split(df, test_size=0.2, random_state=42, stratify=None):
+        shuffled = df.sample(frac=1.0, random_state=random_state)
+        n_test = int(len(df) * test_size)
+        return shuffled.iloc[n_test:].copy(), shuffled.iloc[:n_test].copy()
 
 
 class MedicalDataProcessor:
