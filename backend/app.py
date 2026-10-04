@@ -70,6 +70,9 @@ def initialize_default_model():
 initialize_default_model()
 
 
+@app.route("/", methods=["GET"])
+@app.route("/api", methods=["GET"])
+@app.route("/health", methods=["GET"])
 @app.route("/api/health", methods=["GET"])
 def health_check():
     """Health check endpoint."""
@@ -81,6 +84,7 @@ def health_check():
     })
 
 
+@app.route("/dataset/upload", methods=["POST"])
 @app.route("/api/dataset/upload", methods=["POST"])
 def upload_dataset():
     """Uploads and parses a CSV dataset."""
@@ -106,6 +110,7 @@ def upload_dataset():
         return jsonify({"error": f"Failed to parse dataset: {str(e)}"}), 400
 
 
+@app.route("/dataset/summary", methods=["GET"])
 @app.route("/api/dataset/summary", methods=["GET"])
 def get_dataset_summary():
     """Returns dataset metadata, preview, and column distributions."""
@@ -118,6 +123,7 @@ def get_dataset_summary():
         return jsonify({"error": str(e)}), 400
 
 
+@app.route("/model/train", methods=["POST"])
 @app.route("/api/model/train", methods=["POST"])
 def train_model():
     """Trains the Bayesian Network on selected target and input features."""
@@ -164,6 +170,7 @@ def train_model():
         return jsonify({"error": f"Training failed: {str(e)}"}), 500
 
 
+@app.route("/model/network", methods=["GET"])
 @app.route("/api/model/network", methods=["GET"])
 def get_network():
     """Returns the DAG topology, node attributes, parents/children, and CPTs."""
@@ -176,6 +183,7 @@ def get_network():
         return jsonify({"error": str(e)}), 400
 
 
+@app.route("/model/evaluation", methods=["GET"])
 @app.route("/api/model/evaluation", methods=["GET"])
 def get_evaluation():
     """Returns held-out test evaluation metrics and baseline comparison."""
@@ -188,6 +196,7 @@ def get_evaluation():
         return jsonify({"error": str(e)}), 400
 
 
+@app.route("/analyze", methods=["POST"])
 @app.route("/api/analyze", methods=["POST"])
 def analyze_patient():
     """Calculates posterior probability distribution given supplied evidence."""
@@ -209,6 +218,7 @@ def analyze_patient():
         return jsonify({"error": f"Inference error: {str(e)}"}), 400
 
 
+@app.route("/report", methods=["GET"])
 @app.route("/api/report", methods=["GET"])
 def generate_report():
     """Generates and returns the academic case study report."""

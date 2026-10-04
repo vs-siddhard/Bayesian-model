@@ -26,6 +26,29 @@ class APIService {
 
   constructor() {
     this.initDefaultModel();
+    // Auto-detect deployed Vercel backend
+    if (
+      typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      this.autoDetectDeployedBackend();
+    }
+  }
+
+  private async autoDetectDeployedBackend() {
+    try {
+      const res = await fetch(this.getApiUrl('/api/health'), {
+        headers: { Accept: 'application/json' },
+        signal: AbortSignal.timeout(3000),
+      });
+      if (res.ok) {
+        this.mode = 'flask';
+        console.log('[INFO] Deployed Vercel backend detected and connected.');
+      }
+    } catch {
+      // Keep integrated fallback
+    }
   }
 
   private getApiUrl(endpoint: string): string {
