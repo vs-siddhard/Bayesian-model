@@ -1,0 +1,6 @@
+{
+  "name": "Bayesian Network for Intelligent Medical Analysis",
+  "description": "Probabilistic graphical model and educational clinical decision-support system for preliminary medical dataset analysis using Bayesian Networks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
