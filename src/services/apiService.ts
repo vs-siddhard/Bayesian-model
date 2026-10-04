@@ -16,11 +16,27 @@ export type BackendMode = 'integrated' | 'flask';
 
 class APIService {
   private mode: BackendMode = 'integrated';
-  private flaskUrl: string = 'http://localhost:5000';
+  private flaskUrl: string =
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+      ? window.location.origin
+      : 'http://localhost:5000';
   private isInitialized: boolean = false;
 
   constructor() {
     this.initDefaultModel();
+  }
+
+  private getApiUrl(endpoint: string): string {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    if (
+      !this.flaskUrl ||
+      (typeof window !== 'undefined' && this.flaskUrl === window.location.origin)
+    ) {
+      return cleanEndpoint;
+    }
+    return `${this.flaskUrl.replace(/\/$/, '')}${cleanEndpoint}`;
   }
 
   public initDefaultModel() {
@@ -68,7 +84,7 @@ class APIService {
   public async checkHealth(): Promise<{ status: string; engine: string; mode: BackendMode }> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/health`, {
+        const res = await fetch(this.getApiUrl('/api/health'), {
           headers: { 'Accept': 'application/json' },
           signal: AbortSignal.timeout(3000),
         });
@@ -91,7 +107,7 @@ class APIService {
   public async uploadDataset(csvContent: string): Promise<{ message: string; summary: DatasetSummary }> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/dataset/upload`, {
+        const res = await fetch(this.getApiUrl('/api/dataset/upload'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ csvContent }),
@@ -115,7 +131,7 @@ class APIService {
   public async getDatasetSummary(): Promise<DatasetSummary> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/dataset/summary`);
+        const res = await fetch(this.getApiUrl('/api/dataset/summary'));
         if (res.ok) return await res.json();
       } catch (err) {
         console.warn('Flask summary failed, using integrated engine:', err);
@@ -139,7 +155,7 @@ class APIService {
   }> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/model/train`, {
+        const res = await fetch(this.getApiUrl('/api/model/train'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ targetColumn, featureColumns, testSize }),
@@ -170,7 +186,7 @@ class APIService {
   public async getNetwork(): Promise<NetworkGraphData> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/model/network`);
+        const res = await fetch(this.getApiUrl('/api/model/network'));
         if (res.ok) return await res.json();
       } catch (err) {
         console.warn('Flask get network failed, using integrated engine:', err);
@@ -183,7 +199,7 @@ class APIService {
   public async getEvaluation(): Promise<EvaluationResults> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/model/evaluation`);
+        const res = await fetch(this.getApiUrl('/api/model/evaluation'));
         if (res.ok) return await res.json();
       } catch (err) {
         console.warn('Flask get evaluation failed, using integrated engine:', err);
@@ -200,7 +216,7 @@ class APIService {
   public async analyzePatient(evidence: Record<string, string>): Promise<InferenceResult> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/analyze`, {
+        const res = await fetch(this.getApiUrl('/api/analyze'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ evidence }),
@@ -217,7 +233,7 @@ class APIService {
   public async getReport(format: 'json' | 'html' = 'json'): Promise<any> {
     if (this.mode === 'flask') {
       try {
-        const res = await fetch(`${this.flaskUrl}/api/report?format=${format}`);
+        const res = await fetch(this.getApiUrl(`/api/report?format=${format}`));
         if (res.ok) {
           return format === 'html' ? await res.text() : await res.json();
         }

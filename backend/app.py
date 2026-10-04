@@ -66,6 +66,10 @@ def initialize_default_model():
         print(f"[WARN] Could not auto-initialize default model: {e}")
 
 
+# Initialize model on module load (for WSGI/Serverless deployment like Vercel)
+initialize_default_model()
+
+
 @app.route("/api/health", methods=["GET"])
 def health_check():
     """Health check endpoint."""

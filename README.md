@@ -126,3 +126,13 @@ http://localhost:3000
 - **Python Version:** Recommended Python 3.10, 3.11, or 3.12. If encountering NumPy compile errors on Python 3.13, ensure `numpy<2.0.0` is installed.
 - **Port Conflict:** If port 5000 is occupied (e.g. by macOS AirPlay), run `set FLASK_PORT=5001` (Windows) or `export FLASK_PORT=5001` (Linux/macOS) and update the API base URL in the web dashboard header.
 - **Zero-Config Browser Mode:** If running in an environment without Python, the application automatically engages its high-precision integrated TypeScript Bayesian Network engine with full Variable Elimination and CPT calculations!
+
+---
+
+## 6. Vercel Multi-Service Cloud Deployment
+
+The repository includes a `vercel.json` configured for multi-service deployment:
+- **`app` service (Root `.`)**: Deploys the React 19 + TypeScript frontend built with Vite.
+- **`backend` service (`/backend`)**: Deploys the Python Flask REST API backend with `pgmpy` and `scikit-learn`.
+- **Rewrites**: All `/api/(.*)` requests are routed automatically to the `backend` service, while all other routes are handled by the Vite SPA frontend.
+
